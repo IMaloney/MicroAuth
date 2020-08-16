@@ -1,9 +1,9 @@
-// need to figure this dotenv thing out at some point 
 import './config/config';
 import express from 'express';
 import passport from 'passport';
 import 'express-async-errors';
-import { json } from 'body-parser';
+import helmet from 'helmet';
+// import { json } from 'body-parser';
 import './services/passport';
 
 import { RegularRouter } from './routes/regular-routes';
@@ -23,6 +23,7 @@ declare global {
             FACEBOOK_APPID: string;
             FACEBOOK_SECRET: string;
             PORT: number;
+            VERIFY_EMAIL_KEY: string;
         }
     }
 }
@@ -34,7 +35,8 @@ const app = express();
 // might just encrypt the cookie instead
 
 app.set('trust proxy', true);
-app.use(json());
+app.use(helmet());
+app.use(express.json());
 
 
 app.use(RegularRouter);

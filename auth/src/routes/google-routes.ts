@@ -1,9 +1,8 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import passport from 'passport';
 
 const router = express.Router();
 
-// fill in passport stuff
 router.get('/auth/google', 
     passport.authenticate('google', 
     {

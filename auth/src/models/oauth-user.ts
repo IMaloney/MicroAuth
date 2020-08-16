@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
+import { userInfo } from 'os';
 
-
-// necessity for different collections depends solely on the likelihood of ids in different dbs being equal
+// separating id values out because they could possibly be the same for different people
 interface oauthUserAttrs {
-    oauthId: string;
+    facebookId: string;
+    googleId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
 }
 
 interface oauthUserModel extends mongoose.Model<oauthUserDoc> {
@@ -11,11 +15,31 @@ interface oauthUserModel extends mongoose.Model<oauthUserDoc> {
 }
 
 interface oauthUserDoc extends mongoose.Document {
-    oauthId: string;
+    facebookId: string;
+    googleId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
 }
 
 const oauthSchema = new mongoose.Schema({
-    id: {
+    email: {
+        type: String,
+        required: true
+    }, 
+    facebookId: {
+        type: String,
+        required: false
+    }, 
+    googleId: {
+        type: String,
+        required: false
+    }, 
+    firstName: {
+        type: String,
+        required: true
+    }, 
+    lastName: {
         type: String,
         required: true
     }
@@ -30,6 +54,10 @@ const oauthSchema = new mongoose.Schema({
    }
 );
 
-const OauthUser = mongoose.model<oauthUserDoc, oauthUserModel>('OauthUser', oauthSchema);
+oauthSchema.statics.build = (attrs: oauthUserAttrs) => {
+    return new OauthUser(attrs);
+};
 
-export {OauthUser };
+const OauthUser = mongoose.model<oauthUserDoc, oauthUserModel>('oauth-users', oauthSchema);
+
+export { OauthUser };
