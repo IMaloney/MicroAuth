@@ -9,6 +9,7 @@ import './services/passport';
 import { RegularRouter } from './routes/regular-routes';
 import { GoogleRouter } from './routes/google-routes';
 import { FacebookRouter } from './routes/facebook-routes';
+import { VerificationRouter } from './routes/verification-routes';
 import { errorHandler } from './middlewares/error-handler';
 import { NotFoundError } from './errors/not-found-error';
 
@@ -24,6 +25,8 @@ declare global {
             FACEBOOK_SECRET: string;
             PORT: number;
             VERIFY_EMAIL_KEY: string;
+            SENDGRID_API_KEY: string;
+            FROM_EMAIL: string;
         }
     }
 }
@@ -42,6 +45,7 @@ app.use(express.json());
 app.use(RegularRouter);
 app.use(GoogleRouter);
 app.use(FacebookRouter);
+app.use(VerificationRouter);
 
 app.get('/success', (req, res) => {
     res.send("nice!");

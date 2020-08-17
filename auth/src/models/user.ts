@@ -17,11 +17,13 @@ interface UserDoc extends mongoose.Document {
     password: string;
     firstName: string;
     lastName: string;
+    isVerified: boolean;
 }
 
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
+        unique: true,
         required: true
     },
     password: {
@@ -35,6 +37,11 @@ const userSchema = new mongoose.Schema({
     lastName: {
         type: String,
         required: true
+    }, 
+    isVerified: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 }, {
         toJSON: {
@@ -56,10 +63,6 @@ userSchema.pre('save', async function(done) {
     }
     done();   
 });
-
-userSchema.statics.build = (attrs: userAttrs) => {
-    return new User(attrs);
-};
 
 const User = mongoose.model<UserDoc, UserModel>("user", userSchema);
 

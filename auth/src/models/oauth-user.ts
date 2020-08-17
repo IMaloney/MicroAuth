@@ -3,8 +3,6 @@ import { userInfo } from 'os';
 
 // separating id values out because they could possibly be the same for different people
 interface oauthUserAttrs {
-    facebookId: string;
-    googleId: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -53,10 +51,6 @@ const oauthSchema = new mongoose.Schema({
     }
    }
 );
-
-oauthSchema.statics.build = (attrs: oauthUserAttrs) => {
-    return new OauthUser(attrs);
-};
 
 const OauthUser = mongoose.model<oauthUserDoc, oauthUserModel>('oauth-users', oauthSchema);
 

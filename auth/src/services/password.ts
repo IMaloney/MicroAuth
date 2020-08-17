@@ -4,6 +4,7 @@ import { promisify } from 'util';
 // purely for async await
 const scryptAsync = promisify(scrypt);
 
+// hashes password
 export const hash = async (password: string) => {
     const firstSalt = randomBytes(8).toString('hex');
     const secondSalt = randomBytes(8).toString('hex');
@@ -13,6 +14,7 @@ export const hash = async (password: string) => {
     return `${secondSalt}.${newBuf.toString('hex')}.${firstSalt}`;
 }
 
+// compares password hashes
 export const cmp =  async (stored: string, given: string) => {
     const [ secondSalt, hashed, firstSalt ] = stored.split('.');
     const firstBuf = (await scryptAsync(given, firstSalt, 64)) as Buffer;

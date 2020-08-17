@@ -7,6 +7,7 @@ The things that you would need to fill in to use exist in the .env.example file.
 
 ## Features:
 - email/ password sanitation
+- email validation
 - email verification
 - Facebook signup
 - Google signup
@@ -15,4 +16,8 @@ The things that you would need to fill in to use exist in the .env.example file.
 ## Notes:
 If you ever decide on adding an env variable, make sure to also add its type to the ProcessEnv interface in the app file. This is purely for typescript.
 
-This service uses the email verify api to prove the email actually exists. In the future, I will probably use a different api to achieve this verification but for now this works because it is one of the few services that allows for one time payments (as opposed to monthly signups). 
+This service uses two separate email apis for verification and sending emails. The first, verify email, checks to see if the email exists. The second, sendgrid, is to actually send the email. Sendgrid has their own email verification service, but there were a few reasons for doing this. First, sendgrid's email verification service is only available to a pricey tier in their plans. It is actually cheaper to buy a one time set of 10,000 verifications from verify email and then use the free tier of sendgrid to send emails versus solely using sendgrid. The second reason is to prevent bots from sending emails to sendgrid. Spam emails take away from the free tier and we are really not trying to spend more than $20 total right now. Plus the goal is to try to keep the email hit rate high and spam detracts from that a lot.
+
+## External Apis
+- verify email https://verify-email.org/
+- send grid
