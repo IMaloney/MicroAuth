@@ -2,6 +2,7 @@ import passport from 'passport';
 import passportFacebook from 'passport-facebook';
 import passportGoogle, { VerifyCallback } from 'passport-google-oauth2';
 import { OauthUser } from '../models/oauth-user';
+import { InternalServerError } from '../errors/internal-server-error';
 
 const FacebookStrategy = passportFacebook.Strategy;
 const GoogleStrategy = passportGoogle.Strategy;
@@ -15,17 +16,22 @@ passport.use(new GoogleStrategy(
             scope: ['email']
         }, 
         async (accessToken:string, refreshToken:string, profile:any, done:VerifyCallback)=> {
-            let user: any = OauthUser.findOne({ googleId: profile.id });
+            let user = await OauthUser.findOne({ googleId:profile.id });
             // if the user doesn't exist, make a user
             if (!user) {
-                user = await new OauthUser(
+                user = new OauthUser(
                     {
                         googleId: profile.id, 
                         email: profile.email, 
                         firstName:profile.given_name, 
                         lastName: profile.family_name 
                     }
-                ).save();
+                );
+                await user.save(err => {
+                    if (err){ 
+                        throw new InternalServerError('something went wrong on our part.'); 
+                    }
+                });
             } 
             done(null, user);
         }
@@ -41,7 +47,7 @@ passport.use(new FacebookStrategy(
             profileFields: ['email', 'name']
         },
         async (accessToken:string, refreshToken:string, profile:any, done:VerifyCallback) => {
-            let user: any = OauthUser.findOne({ facebookId: profile.id});
+            let user = await OauthUser.findOne({ facebookId: profile.id});
             // if the user doesn't exist, make a user
             if (!user) {
               user = await new OauthUser(
@@ -51,10 +57,14 @@ passport.use(new FacebookStrategy(
                         firstName: profile._json.first_name,
                         lastName: profile._json.last_name
                     }
-                ).save();
+                );
+                await user.save(err => {
+                    if (err) {
+                        throw new InternalServerError('something went wrong on our part.');
+                    }
+                });
             }
             done(null, user);
-        
         }
     )        
 );

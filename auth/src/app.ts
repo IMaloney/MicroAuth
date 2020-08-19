@@ -1,9 +1,8 @@
 import './config/config';
 import express from 'express';
-import passport from 'passport';
 import 'express-async-errors';
 import helmet from 'helmet';
-// import { json } from 'body-parser';
+import cookieSession from 'cookie-session';
 import './services/passport';
 
 import { RegularRouter } from './routes/regular-routes';
@@ -24,6 +23,7 @@ declare global {
             FACEBOOK_APPID: string;
             FACEBOOK_SECRET: string;
             PORT: number;
+            JWT_KEY: string;
             VERIFY_EMAIL_KEY: string;
             SENDGRID_API_KEY: string;
             FROM_EMAIL: string;
@@ -33,27 +33,19 @@ declare global {
 
 const app = express();
 
-// storing a jwt in a cookie because the browser will do us a favor and manage the cookie, while the jwt prevents 
-// changing whats in the cookie
-// might just encrypt the cookie instead
-
 app.set('trust proxy', true);
 app.use(helmet());
 app.use(express.json());
+app.use(cookieSession({
+    signed: false,
+    secure: process.env.NODE_ENV !== 'test'
+}));
 
 
 app.use(RegularRouter);
 app.use(GoogleRouter);
 app.use(FacebookRouter);
 app.use(VerificationRouter);
-
-app.get('/success', (req, res) => {
-    res.send("nice!");
-}); 
-
-app.get('/fail', (req, res) => {
-    res.send("fail, boo!");
-});
 
 app.all('*', async (req, res, next) => {
     throw new NotFoundError();

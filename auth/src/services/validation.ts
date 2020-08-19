@@ -5,7 +5,6 @@ import { InternalServerError } from '../errors/internal-server-error';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// UPDATE: cheaper to buy bulk verifications and use send grids free tier given that we probably won't have more than x users
 export const emailDoesExist = async (email: string) => {
     // may change this api to a more popular one in the future
     const url = `https://app.verify-email.org/api/v1/${process.env.VERIFY_EMAIL_KEY}/verify/${email}`
@@ -22,8 +21,7 @@ export const emailDoesExist = async (email: string) => {
     }
 };
 
-// will use templates to send emails... you should too, they look nice and are good from a marketing stand point
-// using host from request so we don't have to make that an environment variable and change it every time
+// TODO: make template, replace html with template
 export const sendValidationEmail = async (to: string, host: string, token: string) => {
     const link = `${host}/confirmation/?token=${token}&email=${to}`;
     console.log(link);

@@ -7,6 +7,8 @@ import { InternalServerError } from '../errors/internal-server-error';
 import * as validation from '../services/validation';
 import { cmp } from '../services/password';
 import { validateRequest } from '../middlewares/request-validator';
+import { currentUser } from '../middlewares/current-user';
+import { createJWT } from '../services/jwt';
 
 const router = express.Router();
 
@@ -63,7 +65,6 @@ router.post('/users/signup',
         const token = new Token({ userId: user._id, token: validation.createToken() })
         await token.save(err => {
             if (err) {
-                console.log(err);
                 throw new InternalServerError('Something went wrong on our part.');
             }
         });
@@ -71,6 +72,9 @@ router.post('/users/signup',
         // TODO: overriding ts based on the assumption the host header will always be set, so double check this
         await validation.sendValidationEmail(email, host!, token.token);
         // session stuff here
+        req.session = {
+            jwt: createJWT(user.email, user.id)
+        };
 
         res.status(201).send(user);
 
@@ -84,9 +88,8 @@ router.post('/users/signin',
                      .bail()
                      .isEmail().withMessage('Email must be valid'),
         body('password').trim()
-                        .notEmpty()
+                        .notEmpty().withMessage('password required')
                         .bail()
-                        .isLength({min:8, max:128}).withMessage('Password should be between 8 and 128 characters.')
     ], 
     validateRequest,
     async (req: Request, res: Response) => {
@@ -101,15 +104,23 @@ router.post('/users/signin',
     }
 
     // session stuff here
-
+    req.session = {
+        jwt: createJWT(existingUser.email, existingUser.id)
+    };
 
     res.status(200).send(existingUser);
 });
 
 router.post('/users/signout', (req: Request, res: Response) => {
-// need to nullify session
-    res.send({});
+
+    req.session = null;
+    res.status(200).send({});
 });
 
+// since the frontend can't verify the jwt, this is done through another route
+// TODO: figure out if this is necessary for this
+router.get('/users/currentuser', currentUser, (req: Request, res: Response) =>{
+    res.send({currentUser: req.currentUser || null })
+});
 
 export { router as RegularRouter };

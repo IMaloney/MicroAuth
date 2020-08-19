@@ -46,6 +46,9 @@ const oauthSchema = new mongoose.Schema({
         transform(doc, ret) {
             ret.id = ret._id;
             delete ret._id;
+            if (ret.googleId) { delete ret.googleId; }
+            if (ret.facebookId) { delete ret.facebookId; }
+            
         },
         versionKey: false
     }

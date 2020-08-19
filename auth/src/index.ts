@@ -14,11 +14,16 @@ const start = async () => {
     // exit if you can't connect to the db
     } catch(err) {
         console.log(err);
-        process.exit();
+        process.exit(1);
     } 
     app.listen(process.env.PORT, () => {
         console.log('listening on port', process.env.PORT);
     });
 };
+
+if (!process.env.PORT) {
+    console.log('no port');
+    process.exit(1);
+}
 
 start();

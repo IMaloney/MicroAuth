@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
                 ret.id = ret._id;
                 delete ret._id;
                 delete ret.password;
-                // may also remove first and last name in request as well
+                // TODO: may also remove first and last name in request as well
             }, 
             versionKey: false
         }

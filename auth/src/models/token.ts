@@ -32,7 +32,6 @@ const tokenSchema = new mongoose.Schema({
         // 12 hours 
         expires: 43200
     }
-
 }
 );
 
